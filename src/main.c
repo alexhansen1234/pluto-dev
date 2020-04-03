@@ -3,9 +3,15 @@
 #include <pthread.h>
 #include <signal.h>
 #include <assert.h>
-#include <iio.h>
 #include <complex.h>
+#include <string.h>
 #include <liquid/liquid.h>
+
+#ifdef __APPLE__
+  #include <iio/iio.h>
+#else
+  #include <iio.h>
+#endif
 
 enum iodev { RX, TX };
 
@@ -54,6 +60,8 @@ int main(int argc, char ** argv)
   fp = fopen("output.txt", "w");
 
   ctx = iio_create_context_from_uri("ip:192.168.2.1");
+
+  assert(ctx != NULL && "IIO context could not be created");
 
   pthread_create( &tx_thread, NULL, transmit_thread, (void *)ctx );
   pthread_create( &rx_thread, NULL, receive_thread,  (void *)ctx );
